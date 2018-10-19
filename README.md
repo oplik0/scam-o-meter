@@ -1,0 +1,2 @@
+# Scam-o-meter
+
