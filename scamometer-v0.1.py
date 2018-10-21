@@ -4,7 +4,7 @@ import time
 class CheckKRS:
     def __init__ (self, number):
         self.scam = 0 #miernik - z założenia ta zmienna ma osiągać wartości od 0 do 100
-        self.flags = dict(dict.fromkeys["www", "email", "adress", "country", "pkd", "relations", "status", "registration_date", "assets", "court", "management", "existance", "connection_error"], False) #flagi które zostaną przełączone gdy w danych KRS znajdzie się coś wskazującego na scam. Praktycznie u każdej firmy przełączy się część, dlatego dopiero więskza ilość będzie wskazywała na problemy z firmą
+        self.flags = dict(dict.fromkeys(["www", "email", "adress", "country", "pkd", "relations", "status", "registration_date", "assets", "court", "management", "existance", "connection_error"], False)) #flagi które zostaną przełączone gdy w danych KRS znajdzie się coś wskazującego na scam. Praktycznie u każdej firmy przełączy się część, dlatego dopiero więskza ilość będzie wskazywała na problemy z firmą
         self.number = number
         
     def fetch_data (self):
