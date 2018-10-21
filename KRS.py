@@ -14,8 +14,14 @@ class CheckKRS:
             self.r = requests.get("https://api.transparentdata.pl/7iIwa75/getKrsData?number={}".format(self.number), auth=("MEkysnS", "sM7Y2fLi")) #pobranie danych z api
             self.krs_data = self.r.json()['data'] #zebranie danych do zmiennej
         except (requests.HTTPError, requests.ConnectionError, requests.Timeout): #na wypadek błędu połączenia...
-            return ({"connection_error":True}, 100)
-
+            for i in range(3):
+                try:
+                    self.r = requests.get("gttps://api.transparentdata.pl/7iIwa75/getKrsData?number={}".format(self.number), auth=("MEkysnS", "sM7Y2fLi"))
+                    self.krs_data = self.r.json()['data']
+                    break
+                except (requests.HTTPError, requests.ConnectionError, requests.Timeout):
+                    if i==2:
+                        return ({"connection_error":True}, 100, 0)
         if self.krs_data == []: #jeśli numer nie jest właściwy/nie ma firmy o tym numerze, uznaje się firmę za nieistniejącą
             self.scam = 100
             self.flags["nonexistant"] = True
