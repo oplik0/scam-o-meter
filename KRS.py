@@ -75,7 +75,7 @@ class CheckKRS:
             self.flags["adress"] = True
         if self.scam>=100:
             self.scam = 99
-        return self.flags, self.scam, self.date, self.adress
+        return self.flags, self.scam, self.date, self.adress, self.krs_data["NIP"]
 
     def read_date(self):
         registration_date = self.krs_data["data_utworzenia"]
@@ -117,9 +117,10 @@ class CheckKRS:
             return True
 if __name__ == '__main__':
     Check = CheckKRS(input("wpisz numer KRS/NIP/REGON: "))
-    flags, scam, date, adress = Check.read_details()
+    flags, scam, date, adress, nip = Check.read_details()
     print("prawdopodobieństwo scamu:", scam)
-    print("czas od założenia firmy: {} miesięcy".format(date))
+    if flags["registration_date"]:
+        print("czas od założenia firmy: {} miesięcy".format(date))
     print("adres firmy:", adress)
     print("flagi:", flags)
 
