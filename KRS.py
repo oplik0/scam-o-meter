@@ -1,10 +1,11 @@
 import requests
-import time
+from datetime import datetime
 
 class CheckKRS:
     def __init__ (self, number):
         self.scam = 0 #miernik - im większa liczba, tym większe prawdopodobieństwo scamu
         self.flags = dict(dict.fromkeys(["www", "email", "adress", "country", "pkd_full", "relations", "status", "registration_date", "assets", "court", "management", "existance", "connection_error"], False)) #flagi które zostaną przełączone gdy w danych KRS znajdzie się coś wskazującego na scam. Praktycznie u każdej firmy przełączy się część, dlatego dopiero więskza ilość będzie wskazywała na problemy z firmą
+        self.date=''
         self.number = number
         self.fetch_data()
         self.read_details()
@@ -29,6 +30,10 @@ class CheckKRS:
             self.scam+=5
             self.flags["email"] = True
 
+        if self.krs_data["oznaczenie_sadu"].replace("-", "") == "": #sprawdzenie, czy firma ma oznaczenie sądu
+            self.scam+=10
+            self.flags["court"] = True
+
         if self.krs_data["pkd_pelne"].replace("-", "") == "": #sprawdzanie, czy firma ma wpisany więcej niż 1 pkd, co jest częste dla prawdziwych firm, ale rzadkie dla firm powstałych na potrzeby jednego scamu. Oczywiście zdarzają się wyjątki w obie strony.
             self.scam+=15
             self.flags["pkd_full"] = True
@@ -50,8 +55,43 @@ class CheckKRS:
         if self.krs_data["kapital"] == "5000.00": #firma mająca jedynie minimalny kapitał wymagany do rejestracji jest jednak podejrzana
             self.scam+=10
             self.flags["assets"] = True
-        
 
+        if self.read_date(): #sprawdzenie "świerzości" firmy - firma mająca mniej niż kwartał (lub nawet nieco więcej) jest podejrzana
+            self.scam+=10
+            self.flags["registration_date"] = True
+        
+        if self.read_relations(): #sprawdzanie powiązań KRS - w szczególności wspólników i zarządu
+            self.scam+=30
+            self.flags["relations"] = True
+
+    def read_date(self):
+        registration_date = self.krs_data["data_utworzenia"]
+        date_now = datetime.now().isoformat()[:10]
+        if registration_date[:4] is date_now[:4]:
+            if int(date_now[5:7])-int(registration_date[5:7])<=4:
+                self.date = int(date_now[5:7])-int(registration_date[5:7])
+                return True
+            
+        return False
+
+    def read_relations(self):
+        pesel = False
+        for relation in self.krs_data["krs_relations"]:
+            if relation["ident_type"] == "pesel": 
+                pesel = True
+            elif relation["ident_type"] == "name":
+                try:
+                    with open("czarna_lista_przedsiębiorcow.txt", 'r') as blacklist_file: #sprawdzenie pliku z czarną listą imion i nazwisk - nazwiska na niej już były powiązane w przeszłości ze scamem
+                        blacklist = [line.strip() for line in blacklist_file]
+                    if str(relation["name"], relation["last_name"]) in blacklist:
+                        self.scam+=80
+                        self.flags["management"] = True
+                except:
+                    pass
+        if pesel: #brak osoby z podanym numerem pesel w relacjach sugeruje, że coś jest nie tak...
+            return False
+        else:
+            return True
         
         
 if __name__ == '__main__':
