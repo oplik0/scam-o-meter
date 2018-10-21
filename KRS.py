@@ -5,9 +5,9 @@ class CheckKRS:
     def __init__ (self, number):
         self.scam = 0 #miernik - im większa liczba, tym większe prawdopodobieństwo scamu
         self.flags = dict(dict.fromkeys(["www", "email", "adress", "country", "pkd_full", "relations", "status", "registration_date", "assets", "court", "management", "existance", "connection_error"], False)) #flagi które zostaną przełączone gdy w danych KRS znajdzie się coś wskazującego na scam. Praktycznie u każdej firmy przełączy się część, dlatego dopiero więskza ilość będzie wskazywała na problemy z firmą
-        self.date=''
+        self.date=0
         self.number = number
-
+        self.adress = ""
         self.fetch_data()
     def fetch_data (self):
         try:
@@ -70,14 +70,19 @@ class CheckKRS:
             self.scam+=30
             self.flags["relations"] = True
         
-        return(self.flags, self.scam, self.date)
+        if self.read_adress(): #sprawdzenie, czy adres odpowiada któremuś z zebranych w pliku tekstowym biur wirtualnych
+            self.scam+=15
+            self.flags["adress"] = True
+        if self.scam>=100:
+            self.scam = 99
+        return self.flags, self.scam, self.date, self.adress
 
     def read_date(self):
         registration_date = self.krs_data["data_utworzenia"]
         date_now = datetime.now().isoformat()[:10]
         if registration_date[:4] is date_now[:4]:
             if int(date_now[5:7])-int(registration_date[5:7])<=4:
-                self.date = int(date_now[5:7])-int(registration_date[5:7])
+                self.date = int(date_now[5:7])-int(registration_date[5:7])  
                 return True
             
         return False
@@ -87,22 +92,34 @@ class CheckKRS:
         for relation in self.krs_data["krs_relations"]:
             if relation["ident_type"] == "pesel": 
                 pesel = True
-            elif relation["ident_type"] == "name":
+            if relation["ident_type"] in ("name", "pesel"):
                 try:
-                    with open("czarna_lista_przedsiębiorcow.txt", 'r') as blacklist_file: #sprawdzenie pliku z czarną listą imion i nazwisk - nazwiska na niej już były powiązane w przeszłości ze scamem
+                    with open("czarna_lista_przedsiebiorcow.txt", 'r') as blacklist_file: #sprawdzenie pliku z czarną listą imion i nazwisk - nazwiska na niej już były powiązane w przeszłości ze scamem
                         blacklist = [line.strip() for line in blacklist_file]
-                    if str(relation["name"], relation["last_name"]) in blacklist:
+                    if "{} {}".format(relation["name"], relation["last_name"]) in blacklist:
                         self.scam+=80
                         self.flags["management"] = True
-                except:
-                    pass
+                except Exception as e:
+                    print(e)
         if pesel: #brak osoby z podanym numerem pesel w relacjach sugeruje, że coś jest nie tak...
             return False
         else:
             return True
-        
-        
+    
+    def read_adress(self):
+        self.adress = str(self.krs_data["adres"])+' '+str(self.krs_data["numer"])
+        try:
+            with open("./lista_wirtualnych_biur.txt", 'r') as blacklist_file: #sprawdzenie pliku z listą wirtualnych biur
+                blacklist = [line.strip() for line in blacklist_file]
+        except:
+            return False
+        if self.adress[4:].upper() in blacklist:
+            return True
 if __name__ == '__main__':
     Check = CheckKRS(input("wpisz numer KRS/NIP/REGON: "))
-    print(Check.read_details())
+    flags, scam, date, adress = Check.read_details()
+    print("prawdopodobieństwo scamu:", scam)
+    print("czas od założenia firmy: {} miesięcy".format(date))
+    print("adres firmy:", adress)
+    print("flagi:", flags)
 
