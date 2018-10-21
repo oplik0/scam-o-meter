@@ -13,7 +13,7 @@ class CheckKRS:
             self.r = requests.get("https://api.transparentdata.pl/7iIwa75/getKrsData?number={}".format(self.number), auth=("MEkysnS", "sM7Y2fLi")) #pobranie danych z api
             self.krs_data = self.r.json()['data'] #zebranie danych do zmiennej
         except (requests.HTTPError, requests.ConnectionError, requests.Timeout): #na wypadek błędu połączenia...
-            return {"connection_error":True}
+            return ({"connection_error":True}, 100)
 
         if self.krs_data == []: #jeśli numer nie jest właściwy/nie ma firmy o tym numerze, uznaje się firmę za nieistniejącą
             self.scam = 100
@@ -47,7 +47,11 @@ class CheckKRS:
             self.scam += 30 
             self.flags["country"] = True
         
+        if self.krs_data["kapital"] == "5000.00": #firma mająca jedynie minimalny kapitał wymagany do rejestracji jest jednak podejrzana
+            self.scam+=10
+            self.flags["assets"] = True
         
+
         
         
 if __name__ == '__main__':
