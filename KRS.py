@@ -7,8 +7,8 @@ class CheckKRS:
         self.flags = dict(dict.fromkeys(["www", "email", "adress", "country", "pkd_full", "relations", "status", "registration_date", "assets", "court", "management", "existance", "connection_error"], False)) #flagi które zostaną przełączone gdy w danych KRS znajdzie się coś wskazującego na scam. Praktycznie u każdej firmy przełączy się część, dlatego dopiero więskza ilość będzie wskazywała na problemy z firmą
         self.date=''
         self.number = number
+
         self.fetch_data()
-        self.read_details()
     def fetch_data (self):
         try:
             self.r = requests.get("https://api.transparentdata.pl/7iIwa75/getKrsData?number={}".format(self.number), auth=("MEkysnS", "sM7Y2fLi")) #pobranie danych z api
@@ -63,6 +63,8 @@ class CheckKRS:
         if self.read_relations(): #sprawdzanie powiązań KRS - w szczególności wspólników i zarządu
             self.scam+=30
             self.flags["relations"] = True
+        
+        return(self.flags, self.scam, self.date)
 
     def read_date(self):
         registration_date = self.krs_data["data_utworzenia"]
@@ -95,4 +97,6 @@ class CheckKRS:
         
         
 if __name__ == '__main__':
-    CheckKRS(int(input('wpisz numer KRS/NIP/REGON')))
+    Check = CheckKRS(input("wpisz numer KRS/NIP/REGON: "))
+    print(Check.read_details())
+
