@@ -4,10 +4,10 @@ from datetime import datetime
 class CheckKRS:
     def __init__ (self, number):
         self.scam = 0 #miernik - im większa liczba, tym większe prawdopodobieństwo scamu
-        self.flags = dict(dict.fromkeys(["www", "email", "adress", "country", "pkd_full", "relations", "status", "registration_date", "assets", "court", "management", "existance", "connection_error"], False)) #flagi które zostaną przełączone gdy w danych KRS znajdzie się coś wskazującego na scam. Praktycznie u każdej firmy przełączy się część, dlatego dopiero więskza ilość będzie wskazywała na problemy z firmą
+        self.flags = dict(dict.fromkeys(["www", "email", "address", "country", "pkd_full", "pkd" "relations", "status", "registration_date", "assets", "court", "management", "existance", "connection_error"], False)) #flagi które zostaną przełączone gdy w danych KRS znajdzie się coś wskazującego na scam. Praktycznie u każdej firmy przełączy się część, dlatego dopiero więskza ilość będzie wskazywała na problemy z firmą
         self.date=0
         self.number = number
-        self.adress = ""
+        self.address = ""
         self.fetch_data()
     def fetch_data (self):
         try:
@@ -24,7 +24,7 @@ class CheckKRS:
                         return ({"connection_error":True}, 100, 0)
         if self.krs_data == []: #jeśli numer nie jest właściwy/nie ma firmy o tym numerze, uznaje się firmę za nieistniejącą
             self.scam = 100
-            self.flags["nonexistant"] = True
+            self.flags["existance"] = True
             return self.flags
 
     def read_details(self):
@@ -70,12 +70,12 @@ class CheckKRS:
             self.scam+=30
             self.flags["relations"] = True
         
-        if self.read_adress(): #sprawdzenie, czy adres odpowiada któremuś z zebranych w pliku tekstowym biur wirtualnych
+        if self.read_address(): #sprawdzenie, czy adres odpowiada któremuś z zebranych w pliku tekstowym biur wirtualnych
             self.scam+=15
-            self.flags["adress"] = True
+            self.flags["address"] = True
         if self.scam>=100:
             self.scam = 99
-        return self.flags, self.scam, self.date, self.adress, self.krs_data["NIP"]
+        return self.flags, self.scam, self.date, self.address
 
     def read_date(self):
         registration_date = self.krs_data["data_utworzenia"]
@@ -100,27 +100,29 @@ class CheckKRS:
                         self.scam+=80
                         self.flags["management"] = True
                 except Exception as e:
-                    print(e)
+                    #print(e)
+                    pass
         if pesel: #brak osoby z podanym numerem pesel w relacjach sugeruje, że coś jest nie tak...
             return False
         else:
             return True
     
-    def read_adress(self):
-        self.adress = str(self.krs_data["adres"])+' '+str(self.krs_data["numer"])
+    def read_address(self):
+        self.address = str(self.krs_data["adres"])+' '+str(self.krs_data["numer"])
         try:
             with open("./lista_wirtualnych_biur.txt", 'r') as blacklist_file: #sprawdzenie pliku z listą wirtualnych biur
                 blacklist = [line.strip() for line in blacklist_file]
+            if self.address[4:].upper() in blacklist:
+                return True
         except:
             return False
-        if self.adress[4:].upper() in blacklist:
-            return True
+        
 if __name__ == '__main__':
     Check = CheckKRS(input("wpisz numer KRS/NIP/REGON: "))
-    flags, scam, date, adress, nip = Check.read_details()
+    flags, scam, date, address = Check.read_details()
     print("prawdopodobieństwo scamu:", scam)
     if flags["registration_date"]:
         print("czas od założenia firmy: {} miesięcy".format(date))
-    print("adres firmy:", adress)
+    print("adres firmy:", address)
     print("flagi:", flags)
 

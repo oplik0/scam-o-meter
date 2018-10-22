@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="pl">
+ 
+<head>
+    <title>SCAM-O-METER</title>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <style>
+        input[type='number'] {
+            -moz-appearance:textfield;
+        }
+
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+        }
+        .title {
+            margin: auto;
+            text-align: center;
+            font-family: sans-serif;
+        }
+        .scam-o-meter{
+            margin: auto;
+            text-align: center;
+            width: 50%;
+            padding-left: 3%
+        }
+        .numberInput{ 
+            -webkit-border-radius: 15px;
+            -moz-border-radius: 15px;
+            border-radius: 15px;
+            text-align: center;
+            margin: auto;
+        }
+        .styled meter {
+        /* Reset the default appearance */
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+
+        width: 100%;
+        height: 30px;
+        
+        /* For Firefox */
+        background: #EEE;
+        box-shadow: 0 2px 3px rgba(0,0,0,0.2) inset;
+        border-radius: 3px;
+        }
+
+        /* WebKit */
+        .styled meter::-webkit-meter-bar {
+        background: #EEE;
+        box-shadow: 0 2px 3px rgba(0,0,0,0.2) inset;
+        border-radius: 3px;
+        }
+
+        .styled meter::-webkit-meter-optimum-value,
+        .styled meter::-webkit-meter-suboptimum-value,
+        .styled meter::-webkit-meter-even-less-good-value {
+        border-radius: 3px;
+        }
+
+        .styled meter::-webkit-meter-optimum-value {
+        background: #B71C1C;
+        }
+
+        .styled meter::-webkit-meter-suboptimum-value {
+        background: #FFB300;
+        }
+
+        .styled meter::-webkit-meter-even-less-good-value  {
+        background: #64B5F6;
+        }
+
+
+        /* Firefox */
+        .styled meter::-moz-meter-bar {
+        border-radius: 3px;
+        }
+
+        .styled meter:-moz-meter-optimum::-moz-meter-bar {
+        background: #B71C1C;
+        }
+
+        .styled meter:-moz-meter-sub-optimum::-moz-meter-bar {
+        background: #FFB300;
+        }
+
+        .styled meter:-moz-meter-sub-sub-optimum::-moz-meter-bar {
+        background: #64B5F6;
+        }
+        .scam-indicator{
+            border: #B71C1C;
+            margin: auto;
+            border-width: 3px;
+        }
+    </style>
+    <script type="text/javascript">
+        $('#inputSend').submit(function () {
+            check();
+            return false;
+        });
+    <script type="text/javascript">
+        $(function check() {
+          $.ajax({
+            url:'/number', 
+            data: {nr:document.getElementsByClassName("numberInput").value},
+            type: 'POST',
+            success: function(response) {
+                document.getElementById("scam-o-meter display").value = response.scam;
+                var dv = document.createElement('div');
+                dv.className = "scam-indicator";
+                var p = document.createElement('P');
+                var t = document.createTextNode(response.existance);
+                p.appendChild(t);
+                dv.appendChild(p);
+                document.getElementsByClassName("scam-results-container").appendChild(dv);
+                var dv = document.createElement('div');
+                dv.className = "scam-indicator";
+                var p = document.createElement('P');
+                var t = document.createTextNode(response.www);
+                p.appendChild(t);
+                dv.appendChild(p);
+                document.getElementsByClassName("scam-results-container").appendChild(dv);
+                var dv = document.createElement('div');
+                dv.className = "scam-indicator";
+                var p = document.createElement('P');
+                var t = document.createTextNode(response.email);
+                p.appendChild(t);
+                dv.appendChild(p);
+                document.getElementsByClassName("scam-results-container").appendChild(dv);
+                var dv = document.createElement('div');
+                dv.className = "scam-indicator";
+                var p = document.createElement('P');
+                var t = document.createTextNode(response.address);
+                p.appendChild(t);
+                dv.appendChild(p);
+                document.getElementsByClassName("scam-results-container").appendChild(dv);
+                var dv = document.createElement('div');
+                dv.className = "scam-indicator";
+                var p = document.createElement('P');
+                var t = document.createTextNode(response.country);
+                p.appendChild(t);
+                dv.appendChild(p);
+                document.getElementsByClassName("scam-results-container").appendChild(dv);
+                var dv = document.createElement('div');
+                dv.className = "scam-indicator";
+                var p = document.createElement('P');
+                var t = document.createTextNode(response.www);
+                p.appendChild(t);
+                dv.appendChild(p);
+                document.getElementsByClassName("scam-results-container").appendChild(dv);
+                var dv = document.createElement('div');
+                dv.className = "scam-indicator";
+                var p = document.createElement('P');
+                var t = document.createTextNode(response.pkd_full);
+                p.appendChild(t);
+                dv.appendChild(p);
+                document.getElementsByClassName("scam-results-container").appendChild(dv);
+                var dv = document.createElement('div');
+                dv.className = "scam-indicator";
+                var p = document.createElement('P');
+                var t = document.createTextNode(response.relations);
+                p.appendChild(t);
+                dv.appendChild(p);
+                document.getElementsByClassName("scam-results-container").appendChild(dv);
+                var dv = document.createElement('div');
+                dv.className = "scam-indicator";
+                var p = document.createElement('P');
+                var t = document.createTextNode(response.status);
+                p.appendChild(t);
+                dv.appendChild(p);
+                document.getElementsByClassName("scam-results-container").appendChild(dv);
+                var dv = document.createElement('div');
+                dv.className = "scam-indicator";
+                var p = document.createElement('P');
+                var t = document.createTextNode(response.registration_date);
+                p.appendChild(t);
+                dv.appendChild(p);
+                document.getElementsByClassName("scam-results-container").appendChild(dv);
+                var dv = document.createElement('div');
+                dv.className = "scam-indicator";
+                var p = document.createElement('P');
+                var t = document.createTextNode(response.assets);
+                p.appendChild(t);
+                dv.appendChild(p);
+                document.getElementsByClassName("scam-results-container").appendChild(dv);
+                var dv = document.createElement('div');
+                dv.className = "scam-indicator";
+                var p = document.createElement('P');
+                var t = document.createTextNode(response.court);
+                p.appendChild(t);
+                dv.appendChild(p);
+                document.getElementsByClassName("scam-results-container").appendChild(dv);
+                var dv = document.createElement('div');
+                dv.className = "scam-indicator";
+                var p = document.createElement('P');
+                var t = document.createTextNode(response.management);
+                p.appendChild(t);
+                dv.appendChild(p);
+                document.getElementsByClassName("scam-results-container").appendChild(dv);
+                var dv = document.createElement('div');
+                dv.className = "scam-indicator";
+                var p = document.createElement('P');
+                var t = document.createTextNode(response.pkd);
+                p.appendChild(t);
+                dv.appendChild(p);
+                document.getElementsByClassName("scam-results-container").appendChild(dv);
+          },
+          error: function(error) {
+                console.log(error);
+          }
+        });
+    });
+      </script>
+</head>
+ 
+<body>
+ 
+    <div class="container">
+        <div class="title">
+            <h1>SCAM-O-METER</h1>
+        </div>
+        
+        
+        <div class="scam-o-meter">
+            <form id="inputSend">
+            <input type="text" maxlength="10" pattern="\d*" placeholder="KRS/NIP/REGON" class="numberInput" autofocus>
+            <input class="submit" type="submit" value="Send" style="visibility: hidden;" /></form>
+            <center><p class="styled">
+                <meter value="0" min="0" max="100" low="30" high="60" optimum="100" id="scam-o-meter display"></meter>
+            </p></center>
+        </div>
+        <div class="scam-results-container">
+
+        </div>
+ 
+    </div>
+</body>
+ 
+</html>
