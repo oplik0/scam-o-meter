@@ -4,7 +4,7 @@ from datetime import datetime
 class CheckKRS:
     def __init__ (self, number):
         self.scam = 0 #miernik - im większa liczba, tym większe prawdopodobieństwo scamu
-        self.flags = dict(dict.fromkeys(["www", "email", "address", "country", "pkd_full", "pkd" "relations", "status", "registration_date", "assets", "court", "management", "existance", "connection_error"], False)) #flagi które zostaną przełączone gdy w danych KRS znajdzie się coś wskazującego na scam. Praktycznie u każdej firmy przełączy się część, dlatego dopiero więskza ilość będzie wskazywała na problemy z firmą
+        self.flags = dict(dict.fromkeys(["www", "email", "address", "country", "pkd_full", "pkd", "relations", "status", "registration_date", "assets", "court", "management", "existance", "connection_error"], False)) #flagi które zostaną przełączone gdy w danych KRS znajdzie się coś wskazującego na scam. Praktycznie u każdej firmy przełączy się część, dlatego dopiero więskza ilość będzie wskazywała na problemy z firmą
         self.date=0
         self.number = number
         self.address = ""
@@ -21,18 +21,19 @@ class CheckKRS:
                     break
                 except (requests.HTTPError, requests.ConnectionError, requests.Timeout):
                     if i==2:
-                        return ({"connection_error":True}, 100, 0)
+                        self.flags["connection_error"] = True
+                        return (self.flags, 100, 0, 0)
         if self.krs_data == []: #jeśli numer nie jest właściwy/nie ma firmy o tym numerze, uznaje się firmę za nieistniejącą
             self.scam = 100
             self.flags["existance"] = True
             return self.flags
 
     def read_details(self):
-        if self.krs_data['www'].replace("-", "") == "": #sprawdzenie, czy firma ma wpisaną stronę internetową
+        if self.krs_data["www"].replace("-", "") == "": #sprawdzenie, czy firma ma wpisaną stronę internetową
             self.scam+=5
             self.flags["www"] = True
 
-        if self.krs_data['email'].replace("-", "") == "": #sprawdzenie, czy firma ma wpisany kontaktory adres email
+        if self.krs_data["email"].replace("-", "") == "": #sprawdzenie, czy firma ma wpisany kontaktory adres email
             self.scam+=5
             self.flags["email"] = True
 
@@ -54,7 +55,7 @@ class CheckKRS:
             self.scam+=80
             self.flags["status"] = True
 
-        if self.krs_data['kraj'] != "POLSKA": #sprawdzenie, czy firma ma swoją siedzibę w Polsce. Zagraniczna raczej nie jest pożądana.
+        if self.krs_data["kraj"] != "POLSKA": #sprawdzenie, czy firma ma swoją siedzibę w Polsce. Zagraniczna raczej nie jest pożądana.
             self.scam += 30 
             self.flags["country"] = True
         
@@ -100,8 +101,8 @@ class CheckKRS:
                         self.scam+=80
                         self.flags["management"] = True
                 except Exception as e:
-                    #print(e)
-                    pass
+                    print(e)
+                    
         if pesel: #brak osoby z podanym numerem pesel w relacjach sugeruje, że coś jest nie tak...
             return False
         else:

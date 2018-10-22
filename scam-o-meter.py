@@ -2,9 +2,12 @@ from flask import Flask, jsonify, render_template, request
 from KRS import KRS
 app = Flask(__name__)
 
-@app.route("/number", methods=["POST"])
+@app.route("/number", methods=["post"])
 def number():
-    nr = request.args.get('nr', 0, type=int)
+    nr = str(request.values.get('nr'))
+    if len(str(nr))<7:
+        return jsonify({"scam":0, "www":"", "email":"", "address":"", "country":"", "pkd_full":"", "relations":"", "status":"", "registration_date":"", "assets":"", "court":"", "management":"", "existance":"", "pkd":"", "nr":nr})
+    
     getKRS = KRS.CheckKRS(nr)
     flags, scam, date, registration_address = getKRS.read_details()
     www=email=address=country=pkd_full=relations=status=registration_date=assets=court=management=existance=pkd=""
