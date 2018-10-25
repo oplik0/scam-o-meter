@@ -118,15 +118,46 @@
                 type: 'post',
                 success: function(response) {
                     document.getElementById("scam-o-meter display").value = response.scam;
+                    $(".scam-results-container").empty();
                     if (response.existance !== "") {
-                    var dv = document.createElement('div');
-                    dv.className = "scam-indicator";
-                    var p = document.createElement('P');
-                    var t = document.createTextNode(response.existance);
-                    p.appendChild(t);
-                    dv.appendChild(p);
-                    var container = document.getElementsByClassName("scam-results-container")[0];
-                    container.appendChild(dv);
+                        var dv = document.createElement('div');
+                        dv.className = "scam-indicator";
+                        var p = document.createElement('P');
+                        var t = document.createTextNode(response.existance);
+                        p.appendChild(t);
+                        dv.appendChild(p);
+                        var container = document.getElementsByClassName("scam-results-container")[0];
+                        container.appendChild(dv);
+                    }
+                    if (response.status !== "") {
+                        var dv = document.createElement('div');
+                        dv.className = "scam-indicator";
+                        var p = document.createElement('P');
+                        var t = document.createTextNode(response.status);
+                        p.appendChild(t);
+                        dv.appendChild(p);
+                        var container = document.getElementsByClassName("scam-results-container")[0];
+                        container.appendChild(dv);         
+                    }
+                    if (response.management !== "") {
+                        var dv = document.createElement('div');
+                        dv.className = "scam-indicator";
+                        var p = document.createElement('P');
+                        var t = document.createTextNode(response.management);
+                        p.appendChild(t);
+                        dv.appendChild(p);
+                        var container = document.getElementsByClassName("scam-results-container")[0];
+                        container.appendChild(dv);                    
+                    }
+                    if (response.address !== "") {
+                        var dv = document.createElement('div');
+                        dv.className = "scam-indicator";
+                        var p = document.createElement('P');
+                        var t = document.createTextNode(response.address);
+                        p.appendChild(t);
+                        dv.appendChild(p);
+                        var container = document.getElementsByClassName("scam-results-container")[0];
+                        container.appendChild(dv);                    
                     }
                     if (response.www !== "") {
                         var dv = document.createElement('div');
@@ -147,16 +178,6 @@
                         dv.appendChild(p);
                         var container = document.getElementsByClassName("scam-results-container")[0];
                         container.appendChild(dv);
-                    }
-                    if (response.address !== "") {
-                        var dv = document.createElement('div');
-                        dv.className = "scam-indicator";
-                        var p = document.createElement('P');
-                        var t = document.createTextNode(response.address);
-                        p.appendChild(t);
-                        dv.appendChild(p);
-                        var container = document.getElementsByClassName("scam-results-container")[0];
-                        container.appendChild(dv);                    
                     }
                     if (response.country !== "") {
                         var dv = document.createElement('div');
@@ -197,16 +218,6 @@
                         dv.appendChild(p);
                         var container = document.getElementsByClassName("scam-results-container")[0];
                         container.appendChild(dv);                    
-                    }
-                    if (response.status !== "") {
-                        var dv = document.createElement('div');
-                        dv.className = "scam-indicator";
-                        var p = document.createElement('P');
-                        var t = document.createTextNode(response.status);
-                        p.appendChild(t);
-                        dv.appendChild(p);
-                        var container = document.getElementsByClassName("scam-results-container")[0];
-                        container.appendChild(dv);         
                     }           
                     if (response.registration_date !== "") {
                         var dv = document.createElement('div');
@@ -233,16 +244,6 @@
                         dv.className = "scam-indicator";
                         var p = document.createElement('P');
                         var t = document.createTextNode(response.court);
-                        p.appendChild(t);
-                        dv.appendChild(p);
-                        var container = document.getElementsByClassName("scam-results-container")[0];
-                        container.appendChild(dv);                    
-                    }
-                    if (response.management !== "") {
-                        var dv = document.createElement('div');
-                        dv.className = "scam-indicator";
-                        var p = document.createElement('P');
-                        var t = document.createTextNode(response.management);
                         p.appendChild(t);
                         dv.appendChild(p);
                         var container = document.getElementsByClassName("scam-results-container")[0];
